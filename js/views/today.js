@@ -71,7 +71,9 @@ function preTrip(app) {
       if (last && last.city === d.city) last.to = d.date; else acc.push({ city: d.city, cityJp: d.cityJp, from: d.date, to: d.date, id: d.id });
       return acc;
     }, []).map(s => listItem({ ic: 'pin', tone: 'shu', t: `${s.city} {jp:${s.cityJp || ''}}`, d: s.from === s.to ? shortDate(s.from) : `${shortDate(s.from)} עד ${shortDate(s.to)}`, onclick: () => app.go('day/' + s.id) }))),
-    h('div.btns', btn('יום היציאה: מה עושים ב-24.10', 'plane', () => app.go('day/d00'), 'block')));
+    h('div.btns', btn('יום היציאה: מה עושים ב-24.10', 'plane', () => app.go('day/d00'), 'block'),
+      btn('אודות יפן (מהספר של דור)', 'torii', () => app.go('guide/japan'), 'block ghost'),
+      btn('הטיפים של דור לפני הטיול', 'book', () => app.go('guide/dorintro'), 'block ghost')));
 }
 
 function afterTrip(app) {
