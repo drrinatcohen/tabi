@@ -6,7 +6,7 @@ import { loadVersion, getFile, syncOffline, offlineStatus } from './offline.js';
 import { todayView, dayView } from './views/today.js';
 import { tripView } from './views/trip.js';
 import { walletView } from './views/wallet.js';
-import { guidesView, guideView } from './views/guides.js';
+import { guidesView, guideView, shopView, isShop } from './views/guides.js';
 import { helpView } from './views/help.js';
 
 const appEl = document.getElementById('app');
@@ -125,6 +125,7 @@ const NAV = [
   ['today', 'היום', 'sun'],
   ['trip', 'המסלול', 'map'],
   ['wallet', 'כרטיסים', 'ticket'],
+  ['shop', 'קניות ואוכל', 'shop'],
   ['guides', 'איך עושים', 'compass'],
   ['help', 'עזרה', 'buoy'],
 ];
@@ -144,7 +145,8 @@ function render() {
       case 'trip': view = tripView(app, route[1]); break;
       case 'wallet': view = walletView(app); break;
       case 'guides': view = guidesView(app); break;
-      case 'guide': view = guideView(app, route[1]); active = 'guides'; break;
+      case 'shop': view = shopView(app); break;
+      case 'guide': view = guideView(app, route[1]); active = isShop(app, route[1]) ? 'shop' : 'guides'; break;
       case 'help': view = helpView(app); break;
       default: view = todayView(app); active = 'today';
     }
