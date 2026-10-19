@@ -18,7 +18,7 @@ export function helpView(app) {
         h('div', h('div', { style: 'font-weight:800' }, n.label), n.note ? R('div.faint', n.note) : null),
         h('div.row', { style: 'gap:6px;flex:none' },
           n.wa ? linkBtn('וואטסאפ', 'share', 'https://wa.me/' + n.wa.replace(/\D/g, ''), 'sm') : null,
-          n.tel ? linkBtn(n.tel, 'phone', 'tel:' + n.tel.replace(/[^\d+]/g, ''), 'sm primary') : null)))),
+          n.tel ? linkBtn(n.tel, 'phone', 'tel:' + n.tel.replace(/[^\d+]/g, ''), 'sm primary num') : null)))),
 
     h('h2.section', { html: icon('alert') + 'אם קורה ש...' }),
     d.scenarios.map(s => h('details.card', { style: 'padding:0' },

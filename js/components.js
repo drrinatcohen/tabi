@@ -50,7 +50,7 @@ export function openDoc(app, { title, sub, pages, fields }) {
 
 export function fieldsCard(fields) {
   return h('div.card', { style: 'margin:0 0 10px' }, h('dl.kv', { style: 'margin:0' },
-    fields.flatMap(([k, v]) => [h('dt', k), h('dd', h('span.copy', { onclick: () => copyText(v, 'הועתק: ' + v) }, v))])));
+    fields.flatMap(([k, v]) => [h('dt', k), h('dd', h('span.copy', { dir: /[֐-׿]/.test(v) ? null : 'ltr', onclick: () => copyText(v, 'הועתק: ' + v) }, v))])));
 }
 
 // ---------- Dor's book pages with clickable map links ----------
@@ -108,8 +108,8 @@ export function trainCard(app, t, { open = false } = {}) {
         h('div.arrow', { html: icon('arrow') }),
         h('div.stn.to', h('div.time', t.arr), h('div.place', t.to.he, h('span.en', t.to.en))))),
     h('div.seats',
-      h('div.seat.me', h('div.who', app.name(me) + ' · שלי'), h('div.val', `קרון ${t.car} · מושב `, h('bdi', t.seats[me]))),
-      h('div.seat', h('div.who', app.name(other)), h('div.val', `קרון ${t.car} · מושב `, h('bdi', t.seats[other])))),
+      h('div.seat.me', h('div.who', app.name(me) + ' · שלי'), h('div.val', h('div', `קרון ${t.car}`), h('div.nw', 'מושב ', h('bdi', t.seats[me])))),
+      h('div.seat', h('div.who', app.name(other)), h('div.val', h('div', `קרון ${t.car}`), h('div.nw', 'מושב ', h('bdi', t.seats[other]))))),
     h('div.body',
       t.platform ? h('div.row.wrap', { style: 'gap:6px;margin-bottom:6px' }, chip(t.platform, 'ai', 'train'), t.gate ? chip(t.gate, 'shu', 'qr') : null) : null,
       h('div.btns',

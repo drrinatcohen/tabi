@@ -317,7 +317,9 @@ h2.section svg { width: 22px; height: 22px; color: var(--shu); }
 .card .row.between { flex-wrap: wrap; row-gap: 8px; }
 .card .row.between > div { min-width: 0; }
 .flip svg { transform: scaleX(-1); }
-bdi, .ltr { direction: ltr; unicode-bidi: isolate; }
+bdi, .ltr { direction: ltr; unicode-bidi: isolate; white-space: nowrap; }
+.btn.num span { direction: ltr; unicode-bidi: isolate; }
+.nw { white-space: nowrap; }
 .tl-body .btns .btn, .btns .btn.sm { flex: 0 1 auto; }
 
 span.jp { direction: ltr; unicode-bidi: isolate; }
