@@ -2,6 +2,7 @@ import { icon } from '../icons.js';
 import { h, R, btn, chip, callout, heDate, shortDate, nowIn, listItem } from '../ui.js';
 import { store } from '../store.js';
 import { timeline, hotelCard, journal, openBook, actionBtn } from '../components.js';
+import { weatherCard } from '../weather.js';
 
 const START = '2026-10-24';
 const LAND = '2026-10-26';
@@ -97,6 +98,7 @@ export function dayContent(app, day, { isToday = false } = {}) {
       R('div.title', day.title),
       clocks(day)),
     isToday ? h('div.card.flat', { 'data-offline': 'today' }) : null,
+    weatherCard(app, day),
     (day.warn || []).map(w => callout('shu', 'alert', null, w)),
     day.intro ? R('div.card.tint-moss', day.intro) : null,
     ho ? h('div', h('h2.section', { html: icon('bed') + (day.hotelLabel || 'הלילה ישנים ב') }), hotelCard(app, ho, { compact: true })) : null,
