@@ -126,7 +126,7 @@ const NAV = [
   ['trip', 'המסלול', 'map'],
   ['wallet', 'כרטיסים', 'ticket'],
   ['shop', 'קניות ואוכל', 'shop'],
-  ['guides', 'איך עושים', 'compass'],
+  ['guides', 'מדריכים', 'compass'],
   ['help', 'עזרה', 'buoy'],
 ];
 

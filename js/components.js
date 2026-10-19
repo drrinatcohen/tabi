@@ -175,7 +175,7 @@ export function actionBtn(app, a) {
     case 'map': return linkBtn(a.label || 'מפה', 'pin', a.url, 'sm');
     case 'link': return linkBtn(a.label, 'ext', a.url, 'sm');
     case 'call': return linkBtn(a.label, 'phone', 'tel:' + a.tel, 'sm');
-    case 'guide': return btn(a.label || 'איך עושים', 'compass', () => app.go('guide/' + a.id), 'sm');
+    case 'guide': return btn(a.label || 'המדריך', 'compass', () => app.go('guide/' + a.id), 'sm');
     case 'book': return btn(a.label || 'בספר של דור', 'book', () => openBook(app, a.from, a.to), 'sm ghost');
     case 'taxi': return btn(a.label || 'כתובת לנהג', 'car', () => openTaxi(d.hotels[a.id]), 'sm');
     default: return null;

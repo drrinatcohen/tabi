@@ -14,7 +14,7 @@ function list(app, guides) {
 
 export function guidesView(app) {
   return h('div',
-    h('div.screen-head', h('h1', 'איך עושים את זה'), h('div.sub', 'הסברים קצרים ומעשיים, בנויים על הספר של דור ועל בדיקה עדכנית')),
+    h('div.screen-head', h('h1', 'מדריכים'), h('div.sub', 'הסברים קצרים ומעשיים: רכבות, כסף, אוכל, אונסן ויפנית. בנויים על הספר של דור ועל בדיקה עדכנית')),
     list(app, app.data.guides.filter(g => g.group !== SHOP)));
 }
 
@@ -30,7 +30,7 @@ export function guideView(app, id) {
   if (!g) return guidesView(app);
   const shop = g.group === SHOP;
   return h('div',
-    h('div', { style: 'margin-bottom:6px' }, btn(shop ? 'קניות ואוכל' : 'כל ההסברים', 'arrow', () => app.go(shop ? 'shop' : 'guides'), 'sm ghost')),
+    h('div', { style: 'margin-bottom:6px' }, btn(shop ? 'קניות ואוכל' : 'כל המדריכים', 'arrow', () => app.go(shop ? 'shop' : 'guides'), 'sm ghost')),
     h('div.screen-head', h('h1', g.title), g.sub ? h('div.sub', g.sub) : null),
     h('div.prose', { html: g.html }));
 }

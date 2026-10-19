@@ -307,3 +307,5 @@ h2.section svg { width: 22px; height: 22px; color: var(--shu); }
 .flip svg { transform: scaleX(-1); }
 bdi, .ltr { direction: ltr; unicode-bidi: isolate; }
 .tl-body .btns .btn, .btns .btn.sm { flex: 0 1 auto; }
+
+span.jp { direction: ltr; unicode-bidi: isolate; }
