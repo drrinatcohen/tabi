@@ -1,10 +1,11 @@
 // Service worker: app shell cached per build; encrypted data files are cached by the page (tabi-data).
-const VERSION = "8c3a36fae397fbb3";
+const VERSION = "6d4df7d61de4672b";
 const SHELL = ["./", "fonts/assistant-hebrew.woff2", "fonts/assistant-latin.woff2", "fonts/fonts.css", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/components.js", "js/crypto.js", "js/icons.js", "js/main.js", "js/offline.js", "js/store.js", "js/ui.js", "js/views/guides.js", "js/views/help.js", "js/views/today.js", "js/views/trip.js", "js/views/wallet.js", "manifest.webmanifest", "robots.txt", "styles.css"];
 const SHELL_CACHE = 'tabi-shell-' + VERSION;
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(SHELL_CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // 'reload' skips the browser's HTTP cache, so a new build never stores an old copy of a file.
+  e.waitUntil(caches.open(SHELL_CACHE).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

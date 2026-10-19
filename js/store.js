@@ -63,13 +63,16 @@ export async function keepSet(k, v) {
 }
 
 // Save a value everywhere we can; read it from the first place that still has it.
+// Every slow storage call is capped, so a stuck browser API can never block the app from opening.
+const within = (p, ms = 1500) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
+
 export async function persist(k, v) {
   store.set(k, v);
-  await Promise.race([Promise.all([idbSet(k, v), keepSet(k, v)]), new Promise(r => setTimeout(r, 1500))]);
+  await within(Promise.all([idbSet(k, v), keepSet(k, v)]));
 }
 
 export async function recall(k) {
-  const v = store.get(k) ?? await keepGet(k) ?? await Promise.race([idbGet(k), new Promise(r => setTimeout(() => r(null), 1500))]);
+  const v = store.get(k) ?? await within(keepGet(k)) ?? await within(idbGet(k));
   if (v != null && store.get(k) == null) store.set(k, v);
   return v;
 }
