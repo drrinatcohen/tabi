@@ -1,6 +1,6 @@
 import { icon } from '../icons.js';
 import { h, R, btn, linkBtn, callout, chip, toast } from '../ui.js';
-import { store } from '../store.js';
+import { store, persist } from '../store.js';
 import { openDoc } from '../components.js';
 
 export function helpView(app) {
@@ -36,10 +36,16 @@ export function helpView(app) {
     h('div.card', h('dl.kv', { style: 'margin:0' }, d.cancel.flatMap(c => [h('dt', c.hotel), R('dd', c.until)]))),
     R('div.faint', d.cancelNote),
 
+    d.charges?.length ? [
+      h('h2.section', { html: icon('ticket') + 'חיובים שעוד יורדים מהאשראי' }),
+      h('div.card', h('dl.kv', { style: 'margin:0' }, d.charges.flatMap(c => [h('dt', c.hotel), R('dd', c.when)]))),
+      R('div.faint', d.chargesNote),
+    ] : null,
+
     h('h2.section', { html: icon('sliders') + 'הגדרות' }),
     h('div.card',
       h('div.row.between', h('div', h('b', 'הטלפון הזה של: '), app.name(app.who)),
-        btn('להחליף', 'refresh', () => { store.set('who', app.partner()); app.who = app.partner(); toast('עכשיו: ' + app.name(app.who)); app.rerender(); }, 'sm')),
+        btn('להחליף', 'refresh', () => { persist('who', app.partner()); app.who = app.partner(); toast('עכשיו: ' + app.name(app.who)); app.rerender(); }, 'sm')),
       h('div.hr'),
       h('div.row.between', h('b', 'מראה'),
         h('div.seg', { style: 'margin:0;flex:0 0 auto' },

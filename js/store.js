@@ -47,3 +47,29 @@ export async function idbSet(k, v) {
     });
   } catch { /* ignore */ }
 }
+
+// Third copy in Cache Storage: survives cases where iOS drops localStorage/IndexedDB of a home-screen app.
+const KEEP_CACHE = 'tabi-keep';
+
+export async function keepGet(k) {
+  try {
+    const hit = await (await caches.open(KEEP_CACHE)).match('keep/' + k);
+    return hit ? (await hit.json()).v : null;
+  } catch { return null; }
+}
+
+export async function keepSet(k, v) {
+  try { await (await caches.open(KEEP_CACHE)).put('keep/' + k, new Response(JSON.stringify({ v }))); } catch { /* ignore */ }
+}
+
+// Save a value everywhere we can; read it from the first place that still has it.
+export async function persist(k, v) {
+  store.set(k, v);
+  await Promise.race([Promise.all([idbSet(k, v), keepSet(k, v)]), new Promise(r => setTimeout(r, 1500))]);
+}
+
+export async function recall(k) {
+  const v = store.get(k) ?? await keepGet(k) ?? await Promise.race([idbGet(k), new Promise(r => setTimeout(() => r(null), 1500))]);
+  if (v != null && store.get(k) == null) store.set(k, v);
+  return v;
+}

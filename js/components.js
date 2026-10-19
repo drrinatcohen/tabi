@@ -142,6 +142,7 @@ export function hotelCard(app, ho, { compact = false } = {}) {
       ho.phone ? linkBtn('חיוג', 'phone', 'tel:' + ho.tel) : null),
     compact ? null : [
       ho.cancel ? R('div.faint', '🗓️ ' + ho.cancel) : null,
+      ho.payment ? R('div.faint', '💳 ' + ho.payment) : null,
       ho.tips?.length ? h('div', { style: 'margin-top:10px' }, h('h3', 'טיפים למלון'), h('ul', { style: 'margin:0;padding-inline-start:20px' }, ho.tips.map(t => R('li', t)))) : null,
       ho.book ? h('div.btns', btn('העמוד של המלון בספר של דור', 'book', () => openBook(app, ho.book, ho.book, ho.name), 'ghost')) : null,
     ]);

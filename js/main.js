@@ -1,6 +1,6 @@
 import { icon } from './icons.js';
 import { h, toast } from './ui.js';
-import { store, idbGet, idbSet } from './store.js';
+import { store, persist, recall } from './store.js';
 import { b64uToBytes, bytesToB64u, importKey, decryptBuf, decryptJSON, unwrapWithPassphrase } from './crypto.js';
 import { loadVersion, getFile, syncOffline, offlineStatus } from './offline.js';
 import { todayView, dayView } from './views/today.js';
@@ -39,14 +39,12 @@ async function readKey() {
   const m = location.hash.match(/k=([A-Za-z0-9_-]{40,})/);
   if (m) {
     const raw = b64uToBytes(m[1]);
-    store.set('k', m[1]);
-    await idbSet('k', m[1]);
+    await persist('k', m[1]);
     history.replaceState(null, '', location.pathname + location.search + '#/today');
     return raw;
   }
-  const saved = store.get('k') || await idbGet('k');
-  if (saved) { store.set('k', saved); return b64uToBytes(saved); }
-  return null;
+  const saved = await recall('k');
+  return saved ? b64uToBytes(saved) : null;
 }
 
 function unlockScreen(wrap) {
@@ -58,7 +56,7 @@ function unlockScreen(wrap) {
       try {
         const raw = await unwrapWithPassphrase(input.value, wrap);
         const b = bytesToB64u(raw);
-        store.set('k', b); await idbSet('k', b);
+        await persist('k', b);
         resolve(raw);
       } catch { err.textContent = 'מילת הקוד לא נכונה. נסו שוב, או פתחו שוב את הקישור מהוואטסאפ.'; }
     };
@@ -76,7 +74,7 @@ function unlockScreen(wrap) {
 
 function whoScreen() {
   return new Promise((resolve) => {
-    const pick = (w) => { store.set('who', w); app.who = w; resolve(); };
+    const pick = (w) => { persist('who', w); app.who = w; resolve(); };
     appEl.replaceChildren(h('div.unlock',
       h('div.seal', { style: 'margin:0 auto' }, '旅'),
       h('h1.center', { style: 'margin:6px 0 0;font-size:28px' }, 'מי משתמש בטלפון הזה?'),
@@ -161,6 +159,12 @@ function render() {
 window.addEventListener('hashchange', () => { if (!/k=/.test(location.hash)) render(); });
 
 // ---------- boot ----------
+function needNetwork() {
+  appEl.replaceChildren(h('div.unlock', h('div.seal', { style: 'margin:0 auto' }, '旅'),
+    h('p.center', 'בפתיחה הראשונה צריך אינטרנט כדי לשמור את הכול בטלפון. התחברו לרשת ונסו שוב.'),
+    h('button.btn.primary', { onclick: () => location.reload() }, 'לנסות שוב')));
+}
+
 async function boot() {
   if ('serviceWorker' in navigator) {
     try { await navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }); } catch (e) { console.warn('sw', e); }
@@ -169,28 +173,28 @@ async function boot() {
 
   let ver;
   try { ver = (await loadVersion()).v; }
-  catch {
-    appEl.replaceChildren(h('div.unlock', h('div.seal', { style: 'margin:0 auto' }, '旅'),
-      h('p.center', 'בפתיחה הראשונה צריך אינטרנט כדי לשמור את הכול בטלפון. התחברו לרשת ונסו שוב.'),
-      h('button.btn.primary', { onclick: () => location.reload() }, 'לנסות שוב')));
-    return;
-  }
+  catch { needNetwork(); return; }
   app.ver = ver;
+
+  // A missing file is a network problem, not a wrong key: never ask for the code because of it.
+  let indexBuf;
+  try { indexBuf = await getFile(ver.index); }
+  catch { needNetwork(); return; }
 
   let raw = await readKey();
   let key = raw ? await importKey(raw) : null;
   let data = null;
   if (key) {
-    try { data = await decryptJSON(key, await getFile(ver.index)); }
-    catch { key = null; store.del('k'); }
+    try { data = await decryptJSON(key, indexBuf); } catch { key = null; }
   }
   while (!data) {
     raw = await unlockScreen(ver.wrap);
     key = await importKey(raw);
-    try { data = await decryptJSON(key, await getFile(ver.index)); } catch { store.del('k'); }
+    try { data = await decryptJSON(key, indexBuf); } catch { /* wrong key: ask again */ }
   }
   app.key = key; app.data = data;
 
+  app.who = app.who || await recall('who');
   if (!app.who) await whoScreen();
   if (!location.hash || /k=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#/today');
   render();
