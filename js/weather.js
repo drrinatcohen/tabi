@@ -93,3 +93,23 @@ export function weatherCard(app, day) {
   pending.then(draw);
   return box;
 }
+
+// Rinat 20.10 (design upgrade): the forecast as short chips in the clocks row. A tap opens "ממוצעים ומה ללבוש".
+export function weatherChips(app, day) {
+  if (!day.wx?.length || !app.data.wxPlaces) return null;
+  const box = h('span.wxs');
+  const draw = data => box.replaceChildren(...day.wx.map(id => {
+    const [name] = app.data.wxPlaces[id];
+    const f = data.p?.[id]?.[day.date];
+    if (!f) return h('a.clock.wxc', { href: '#/guide/weather' }, h('span.wi', { html: icon('cal') }), h('span.wt', h('b', name), ' · התחזית תגיע קרוב לתאריך'));
+    const [code, max, min, rain] = f;
+    const [, text, ic] = describe(code);
+    return h('a.clock.wxc', { href: '#/guide/weather', 'aria-label': `${name}: ${text}` },
+      h('span.wi', { html: icon(ic) }),
+      h('span.wt', h('b', name), ' ', text, ' · ביום ', deg(max), ' · בלילה ', deg(min), rain != null ? [' · ', h('span.nw', `גשם ${rain}%`)] : ''));
+  }));
+  draw(store.get(KEY, { at: 0, p: {} }));
+  pending = pending || refresh(app, false).finally(() => { pending = null; });
+  pending.then(draw);
+  return box;
+}

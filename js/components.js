@@ -89,6 +89,15 @@ export function openTaxi(hotel) {
 }
 
 // ---------- train card: the heart of the "no stress" part ----------
+export function trainQrBtn(app, t, cls = 'primary') {
+  const me = app.who, other = app.partner();
+  return btn('הברקוד שלי', 'qr', () => openQR(app, {
+    title: `${t.nameHe} · ${t.dep}`, sub: `${t.from.he} ← ${t.to.he}`,
+    images: t.qr, info: { [me]: `קרון ${t.car} · מושב {ltr:${t.seats[me]}}`, [other]: `קרון ${t.car} · מושב {ltr:${t.seats[other]}}` },
+    hint: 'בשער עם הסימון QR: להחזיק את הברקוד מעל הסורק, לקחת את הפתק שיוצא, ולהשאיר את הברקוד פתוח גם ליציאה בתחנת היעד',
+  }), cls);
+}
+
 export function trainCard(app, t, { open = false } = {}) {
   const me = app.who, other = app.partner();
   const stepsBox = h('div', { hidden: !open },
@@ -113,11 +122,7 @@ export function trainCard(app, t, { open = false } = {}) {
     h('div.body',
       t.platform ? h('div.row.wrap', { style: 'gap:6px;margin-bottom:6px' }, chip(t.platform, 'ai', 'train'), t.gate ? chip(t.gate, 'shu', 'qr') : null) : null,
       h('div.btns',
-        btn('הברקוד שלי', 'qr', () => openQR(app, {
-          title: `${t.nameHe} · ${t.dep}`, sub: `${t.from.he} ← ${t.to.he}`,
-          images: t.qr, info: { [me]: `קרון ${t.car} · מושב {ltr:${t.seats[me]}}`, [other]: `קרון ${t.car} · מושב {ltr:${t.seats[other]}}` },
-          hint: 'בשער עם הסימון QR: להחזיק את הברקוד מעל הסורק, לקחת את הפתק שיוצא, ולהשאיר את הברקוד פתוח גם ליציאה בתחנת היעד',
-        }), 'primary'),
+        trainQrBtn(app, t),
         toggle),
       stepsBox));
 }
@@ -149,22 +154,71 @@ export function hotelCard(app, ho, { compact = false } = {}) {
 }
 
 // ---------- timeline ----------
+// minutes of the day from "09:30" / "~08:45"; an evening item without an hour counts as 18:00
+export function itemMinutes(app, it) {
+  const t = it.train ? app.data.trains[it.train]?.dep : it.t;
+  if (t === 'ערב') return 18 * 60;
+  const m = /(\d{1,2}):(\d{2})/.exec(t || '');
+  return m ? +m[1] * 60 + +m[2] : null;
+}
+
+// Rinat 20.10 (design upgrade): a recommendation shows 3 lines, the rest under "עוד פרטים"; a booking always shows everything.
+const LONG = 170;
+function moreToggle(d) {
+  const b = h('button.more', { type: 'button', 'aria-expanded': 'false' }, 'עוד פרטים');
+  b.addEventListener('click', e => {
+    e.stopPropagation();
+    const open = d.classList.toggle('open');
+    b.textContent = open ? 'פחות' : 'עוד פרטים';
+    b.setAttribute('aria-expanded', String(open));
+  });
+  // if the text fits in 3 lines anyway, no button
+  requestAnimationFrame(() => { if (d.isConnected && d.scrollHeight <= d.clientHeight + 2) { d.classList.remove('clamp'); b.remove(); } });
+  return b;
+}
+
 export function timeline(app, items) {
   return h('ol.timeline', items.map(it => {
-    if (it.train) return h('li', { style: 'list-style:none;margin-bottom:12px' }, trainCard(app, app.data.trains[it.train]));
+    const m = itemMinutes(app, it);
+    if (it.train) return h('li.tl-train', { style: 'list-style:none;margin-bottom:12px', 'data-m': m ?? '' }, trainCard(app, app.data.trains[it.train]));
     // Rinat 19.10: an item with a time looks like a booking, so every item says which it is.
     const tag = it.booked ? chip('מוזמן', 'moss', 'check')
       : it.buy ? chip(it.buy, 'shu', 'ticket')
         : it.rec === 'dor' ? chip('המלצה של דור, אין הזמנה', 'gold')
           : it.rec ? chip('המלצה, אין הזמנה') : null;
-    return h('li.tl-item' + (it.key ? '.key' : ''),
+    const long = it.text && !it.booked && !it.key && it.text.replace(/\*\*|\[|\]\([^)]*\)/g, '').length > LONG;
+    const d = it.text ? R('div.d' + (long ? '.clamp' : ''), it.text) : null;
+    const li = h('li.tl-item' + (it.key ? '.key' : '') + (it.booked ? '.booked' : ''), { 'data-m': m ?? '' },
       h('div.tl-time', h('div.dot', { html: icon(it.ic || 'clock') }), it.t || ''),
       h('div.tl-body',
         R('div.t', it.title),
         tag ? h('div.tl-tag', tag) : null,
-        it.text ? R('div.d', it.text) : null,
+        d,
+        long ? moreToggle(d) : null,
         it.actions?.length ? h('div.btns', it.actions.map(a => actionBtn(app, a))) : null));
+    // a past item is folded to its title; a tap opens it again
+    li.querySelector('.tl-body').addEventListener('click', e => {
+      if (li.classList.contains('past') && !e.target.closest('a,button')) li.classList.toggle('open');
+    });
+    return li;
   }));
+}
+
+// ---------- food: one place per row (name opens Dor's map pin, then what it is, hours, price, booking) ----------
+export function foodList(items) {
+  const row = p => h('div.place',
+    h('a.pn', { href: 'https://maps.app.goo.gl/' + p.c, target: '_blank', rel: 'noopener', html: icon('pin') }, h('span', p.n)),
+    p.d ? h('div.pd', p.d) : null,
+    h('div.pc',
+      p.h ? chip(p.h, '', 'clock') : null,
+      p.p ? chip(p.p, '', 'yen') : null,
+      p.b ? chip(p.b, /חובה/.test(p.b) && !/לא חובה/.test(p.b) ? 'shu' : /מומלץ/.test(p.b) ? 'gold' : '') : null));
+  const plain = items.filter(x => typeof x === 'string');
+  return h('div',
+    plain.length ? h('div.card', h('ul', { style: 'margin:0;padding-inline-start:20px' }, plain.map(t => R('li', t)))) : null,
+    items.filter(x => typeof x !== 'string').map(g => h('div.card.food',
+      g.group ? h('div.fg', g.group) : null,
+      g.places.map(row))));
 }
 
 export function actionBtn(app, a) {
