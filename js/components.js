@@ -152,10 +152,16 @@ export function hotelCard(app, ho, { compact = false } = {}) {
 export function timeline(app, items) {
   return h('ol.timeline', items.map(it => {
     if (it.train) return h('li', { style: 'list-style:none;margin-bottom:12px' }, trainCard(app, app.data.trains[it.train]));
+    // Rinat 19.10: an item with a time looks like a booking, so every item says which it is.
+    const tag = it.booked ? chip('מוזמן', 'moss', 'check')
+      : it.buy ? chip(it.buy, 'shu', 'ticket')
+        : it.rec === 'dor' ? chip('המלצה של דור, אין הזמנה', 'gold')
+          : it.rec ? chip('המלצה, אין הזמנה') : null;
     return h('li.tl-item' + (it.key ? '.key' : ''),
       h('div.tl-time', h('div.dot', { html: icon(it.ic || 'clock') }), it.t || ''),
       h('div.tl-body',
         R('div.t', it.title),
+        tag ? h('div.tl-tag', tag) : null,
         it.text ? R('div.d', it.text) : null,
         it.actions?.length ? h('div.btns', it.actions.map(a => actionBtn(app, a))) : null));
   }));

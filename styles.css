@@ -43,7 +43,7 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
-  font-family: 'Assistant', 'Segoe UI', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  font-family: 'Noto Sans Hebrew', 'Segoe UI', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
   font-size: 17px; line-height: 1.55; overscroll-behavior-y: none;
 }
 .jp { font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Meiryo', sans-serif; }
@@ -128,6 +128,9 @@ h3 { font-size: 18px; margin: 0 0 6px; font-weight: 800; }
 .tl-item.key .tl-time .dot svg { color: var(--shu-ink); }
 .tl-body { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; }
 .tl-body .t { font-weight: 700; }
+.tl-tag { margin: 4px 0 2px; }
+.tl-tag .chip { font-size: 12.5px; padding: 2px 9px; gap: 4px; }
+.tl-tag .chip svg { width: 13px; height: 13px; }
 .tl-body .d { color: var(--ink-2); font-size: 15.5px; margin-top: 2px; }
 .tl-body .btns { margin-top: 8px; }
 
