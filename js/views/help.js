@@ -1,6 +1,6 @@
 import { icon } from '../icons.js';
 import { h, R, btn, linkBtn, callout, chip, toast } from '../ui.js';
-import { store, persist } from '../store.js';
+import { store, persist, wipeAll } from '../store.js';
 import { openDoc } from '../components.js';
 
 export function helpView(app) {
@@ -53,7 +53,44 @@ export function helpView(app) {
       h('div.hr'),
       h('div', { 'data-offline': '' }),
       h('div.btns', btn('לבדוק עדכונים', 'refresh', () => location.reload(), 'sm')),
-      h('div.faint', { style: 'margin-top:8px' }, `גרסה ${app.ver.v.slice(0, 8)} · התוכן מוצפן ונפתח רק עם הקישור שלכם`)));
+      h('div.faint', { style: 'margin-top:8px' }, `גרסה ${app.ver.v.slice(0, 8)} · התוכן מוצפן ונפתח רק עם הקישור שלכם`),
+      h('div.hr'),
+      wipeRow(app)));
+}
+
+// Rinat 20.10: "בעזרה, בהגדרות, שבלחיצת כפתור ימחקו כל הקבצים שנשמרו מהאפליקציה". Two taps, with a clear warning.
+function wipeRow(app) {
+  const box = h('div');
+  const wipe = async (e) => {
+    e.currentTarget.disabled = true;
+    await wipeAll();
+    for (const u of app.urls.values()) URL.revokeObjectURL(u);
+    app.urls.clear();
+    app.data = null; app.key = null;
+    document.getElementById('overlay-root').replaceChildren();
+    document.body.style.overflow = '';
+    history.replaceState(null, '', location.pathname);
+    document.getElementById('app').replaceChildren(h('div.unlock',
+      h('div.seal', { style: 'margin:0 auto' }, '旅'),
+      h('h1.center', { style: 'margin:6px 0 0;font-size:28px' }, 'הכול נמחק מהטלפון הזה'),
+      h('p.center.muted', 'אפשר גם להסיר את סמל האפליקציה ממסך הבית.'),
+      h('p.center.muted', 'כדי לפתוח שוב: לפתוח את הקישור מהוואטסאפ, או ללחוץ כאן ולהקליד את מילת הקוד. צריך אינטרנט.'),
+      h('button.btn.primary.block', { type: 'button', onclick: () => location.replace(location.pathname) }, 'לפתוח מחדש')));
+    window.scrollTo(0, 0);
+    setTimeout(wipeAll, 3000); // a file that was still downloading when the button was pressed
+  };
+  const confirm = () => { box.replaceChildren(h('div.wipe',
+    R('div', '**למחוק את כל המידע של האפליקציה מהטלפון הזה?**\n'
+      + 'יימחקו המסמכים, הברקודים, הצ\'קליסט **והיומן שנכתב בטלפון הזה**. אי אפשר לשחזר.\n'
+      + `בטלפון של ${app.name(app.partner())} שום דבר לא משתנה.\n`
+      + 'כדי לפתוח שוב צריך אינטרנט, ואת הקישור מהוואטסאפ או את מילת הקוד.'),
+    h('div.btns', btn('כן, למחוק הכול', 'trash', wipe, 'danger'), btn('ביטול', null, closed, 'ghost'))));
+    box.scrollIntoView({ block: 'center', behavior: 'smooth' }); };
+  const closed = () => box.replaceChildren(h('div.row.between',
+    h('div', h('b', 'מחיקת כל המידע מהטלפון הזה'), h('div.faint', 'מסמכים, ברקודים, צ\'קליסט ויומן')),
+    btn('למחוק', 'trash', confirm, 'sm danger-ghost')));
+  closed();
+  return box;
 }
 
 export function applyTheme() {

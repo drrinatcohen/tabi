@@ -1,5 +1,6 @@
 // Per-phone preferences (who is using this phone, checklist, journal). Never required for the app to work.
 const NS = 'tabi:';
+let wiped = false; // after "delete everything" nothing is written again until the app is reopened
 
 export const store = {
   get(k, fallback = null) {
@@ -9,6 +10,7 @@ export const store = {
     } catch { return fallback; }
   },
   set(k, v) {
+    if (wiped) return false;
     try { localStorage.setItem(NS + k, JSON.stringify(v)); return true; } catch { return false; }
   },
   del(k) {
@@ -21,7 +23,8 @@ function idb() {
   return new Promise((resolve, reject) => {
     const r = indexedDB.open('tabi', 1);
     r.onupgradeneeded = () => r.result.createObjectStore('kv');
-    r.onsuccess = () => resolve(r.result);
+    // close when asked to, so "delete everything" can remove the database right away
+    r.onsuccess = () => { r.result.onversionchange = () => r.result.close(); resolve(r.result); };
     r.onerror = () => reject(r.error);
   });
 }
@@ -67,8 +70,24 @@ export async function keepSet(k, v) {
 const within = (p, ms = 1500) => Promise.race([p, new Promise(r => setTimeout(() => r(null), ms))]);
 
 export async function persist(k, v) {
+  if (wiped) return;
   store.set(k, v);
   await within(Promise.all([idbSet(k, v), keepSet(k, v)]));
+}
+
+// Rinat 20.10: a button in Help → settings deletes everything the app saved on this phone.
+// Only this app's data: the address (drrinatcohen.github.io) is shared with other GitHub pages.
+export async function wipeAll() {
+  wiped = true;
+  try { Object.keys(localStorage).filter(k => k.startsWith(NS)).forEach(k => localStorage.removeItem(k)); } catch { /* ignore */ }
+  try { for (const k of await caches.keys()) if (k.startsWith('tabi-')) await caches.delete(k); } catch { /* ignore */ }
+  try {
+    const scope = new URL('./', location.href).href;
+    for (const r of await navigator.serviceWorker.getRegistrations()) if (r.scope === scope) await r.unregister();
+  } catch { /* ignore */ }
+  await within(new Promise((resolve) => {
+    try { const r = indexedDB.deleteDatabase('tabi'); r.onsuccess = r.onerror = () => resolve(); } catch { resolve(); }
+  }), 3000);
 }
 
 export async function recall(k) {

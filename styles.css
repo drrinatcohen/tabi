@@ -104,6 +104,9 @@ h3 { font-size: 18px; margin: 0 0 6px; font-weight: 800; }
 .btn.primary { background: var(--shu); border-color: var(--shu); color: #fff; }
 .btn.ai { background: var(--ai); border-color: var(--ai); color: #fff; }
 .btn.ghost { background: transparent; }
+.btn.danger { background: var(--shu-ink); border-color: var(--shu-ink); color: #fff; }
+.btn.danger-ghost { background: transparent; border-color: var(--shu-ink); color: var(--shu-ink); }
+.wipe { background: var(--shu-soft); border-radius: 14px; padding: 12px 14px; }
 .btn.block { width: 100%; }
 .btn.sm { min-height: 40px; padding: 0 12px; font-size: 15px; border-radius: 12px; }
 .btn svg { width: 20px; height: 20px; flex: none; }
