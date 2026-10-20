@@ -40,11 +40,13 @@
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html { -webkit-text-size-adjust: 100%; }
+/* overscroll-behavior on html (the page scroller), never on body: body is a scroll container here
+   (overflow-x: hidden below), and "none" on it stopped finger swipes on Android from scrolling the page (20.10) */
+html { -webkit-text-size-adjust: 100%; overscroll-behavior-y: none; }
 body {
   margin: 0; background: var(--paper); color: var(--ink);
   font-family: 'Noto Sans Hebrew', 'Segoe UI', system-ui, -apple-system, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
-  font-size: 17px; line-height: 1.55; overscroll-behavior-y: none;
+  font-size: 17px; line-height: 1.55;
 }
 .jp { font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Meiryo', sans-serif; }
 .ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
