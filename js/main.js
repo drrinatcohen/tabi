@@ -9,6 +9,7 @@ import { walletView } from './views/wallet.js';
 import { guidesView, guideView, shopView, isShop } from './views/guides.js';
 import { helpView } from './views/help.js';
 import { weatherView } from './weather.js';
+import { searchView, searchBar, showHit } from './views/search.js';
 
 const appEl = document.getElementById('app');
 
@@ -32,6 +33,13 @@ export const app = {
   asset(id) { return this.data.assets[id]; },
   go(route) { location.hash = '#/' + route; },
   rerender() { render(); },
+  // opened inside the tap itself, so the phone's keyboard comes up (iPhone opens it only from a tap)
+  openSearch() {
+    history.pushState(null, '', '#/search');
+    render();
+    appEl.querySelector('.search-input')?.focus();
+  },
+  hit: null, // what to find and mark on the next screen, after a search result is opened
 };
 window.__app = app; // handy for debugging on the phone
 
@@ -150,15 +158,23 @@ function render() {
       case 'guide': view = guideView(app, route[1]); active = isShop(app, route[1]) ? 'shop' : 'guides'; break;
       case 'help': view = helpView(app); break;
       case 'weather': view = weatherView(app); active = 'today'; break;
+      case 'search': view = searchView(app, decodeURIComponent(route[1] || '')); active = ''; break;
       default: view = todayView(app); active = 'today';
     }
   } catch (e) {
     console.error(e);
     view = h('div.card', 'משהו השתבש בתצוגה. ', h('button.btn.sm', { onclick: () => app.go('today') }, 'חזרה להיום'));
   }
-  appEl.replaceChildren(view, nav(active));
+  // Rinat 20.10: search at the top of every screen
+  appEl.replaceChildren(...(route[0] === 'search' ? [] : [searchBar(app)]), view, nav(active));
   renderOfflineBadge();
   window.scrollTo(0, 0);
+  if (app.hit) {
+    const hit = app.hit;
+    app.hit = null;
+    // after the screen settles (the timeline folds past items in the next frame)
+    setTimeout(() => showHit(appEl, hit), 80);
+  }
 }
 window.addEventListener('hashchange', () => { if (!/k=/.test(location.hash)) render(); });
 
