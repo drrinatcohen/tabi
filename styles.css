@@ -142,6 +142,8 @@ h3 { font-size: 18px; margin: 0 0 6px; font-weight: 800; }
 .wx-name { font-weight: 700; }
 .wx-t { color: var(--ink-2); font-size: 15.5px; }
 .wx-foot { margin-top: 6px; font-size: 13.5px; }
+.wx-day { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; text-decoration: none; color: var(--ink-2); font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+.wx-day .wx-city { font-size: 19px; font-weight: 800; color: var(--shu-ink); }
 .tl-tag { margin: 4px 0 2px; }
 .tl-tag .chip { font-size: 12.5px; padding: 2px 9px; gap: 4px; }
 .tl-tag .chip svg { width: 13px; height: 13px; }

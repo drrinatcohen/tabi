@@ -1,6 +1,7 @@
 // Per-phone preferences (who is using this phone, checklist, journal). Never required for the app to work.
 const NS = 'tabi:';
 let wiped = false; // after "delete everything" nothing is written again until the app is reopened
+export const isWiped = () => wiped;
 
 export const store = {
   get(k, fallback = null) {

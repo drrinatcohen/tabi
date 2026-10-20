@@ -1,5 +1,5 @@
 // Service worker: app shell cached per build; encrypted data files are cached by the page (tabi-data).
-const VERSION = "b96550404d4648fd";
+const VERSION = "cc64de7029aa6032";
 const SHELL = ["./", "fonts/fonts.css", "fonts/noto-sans-hebrew-hebrew.woff2", "fonts/noto-sans-hebrew-latin-ext.woff2", "fonts/noto-sans-hebrew-latin.woff2", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/components.js", "js/crypto.js", "js/icons.js", "js/main.js", "js/offline.js", "js/store.js", "js/ui.js", "js/views/guides.js", "js/views/help.js", "js/views/today.js", "js/views/trip.js", "js/views/wallet.js", "js/weather.js", "manifest.webmanifest", "robots.txt", "styles.css"];
 const SHELL_CACHE = 'tabi-shell-' + VERSION;
 
@@ -21,7 +21,7 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== location.origin) return;
 
   if (url.pathname.endsWith('/version.json')) {
-    e.respondWith(fetch(req).catch(() => caches.open('tabi-data').then(c => c.match('version.json'))));
+    e.respondWith(fetch(req).catch(() => caches.match('version.json', { cacheName: 'tabi-data' })));
     return;
   }
   if (req.mode === 'navigate') {
@@ -29,11 +29,11 @@ self.addEventListener('fetch', (e) => {
     return;
   }
   e.respondWith((async () => {
-    const shell = await caches.open(SHELL_CACHE);
-    const hit = await shell.match(req, { ignoreSearch: true });
+    // lookups only (caches.match with cacheName never creates a cache): after "delete everything" nothing reappears (20.10)
+    const hit = await caches.match(req, { ignoreSearch: true, cacheName: SHELL_CACHE });
     if (hit) return hit;
-    const data = await caches.open('tabi-data');
-    const d = await data.match(req, { ignoreSearch: true }) || await data.match(url.pathname.split('/').slice(-2).join('/'));
+    const d = await caches.match(req, { ignoreSearch: true, cacheName: 'tabi-data' })
+      || await caches.match(url.pathname.split('/').slice(-2).join('/'), { cacheName: 'tabi-data' });
     if (d) return d;
     return fetch(req);
   })());

@@ -155,7 +155,8 @@ function preTrip(app) {
       h('div.row', { style: 'align-items:flex-end;gap:14px;margin-top:8px' },
         h('div.countdown', String(days)),
         h('div', h('div.big', days === 1 ? 'יום לטיסה' : 'ימים לטיסה'), h('div.muted', 'מוצאי שבת 24.10 · 23:30 · נתב"ג טרמינל 3'))),
-      clocks(null)),
+      // Rinat 20.10: the weather on the home screen, at the top where she looks (it opens the screen with every day and city)
+      clocks(null, h('a.clock.wxc', { href: '#/weather' }, h('span.wi', { html: icon('sun') }), h('span.wt', h('b', 'מזג האוויר בטיול'))))),
     installCard(app),
     h('div.card.flat', { 'data-offline': '' }),
     checklistCard(app),

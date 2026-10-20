@@ -1,4 +1,6 @@
 // Keeps every encrypted file of the current version on the phone (Cache Storage), with progress.
+import { isWiped } from './store.js';
+
 const DATA_CACHE = 'tabi-data';
 
 export async function loadVersion() {
@@ -43,7 +45,8 @@ export async function syncOffline(files, onProgress) {
   let failed = 0;
   const queue = missing.slice();
   async function worker() {
-    while (queue.length) {
+    // "delete everything" (Help → settings) stops the download, so nothing is saved again after it (20.10)
+    while (queue.length && !isWiped()) {
       const f = queue.shift();
       try {
         const r = await fetch(f, { cache: 'no-store' });

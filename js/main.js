@@ -8,6 +8,7 @@ import { tripView } from './views/trip.js';
 import { walletView } from './views/wallet.js';
 import { guidesView, guideView, shopView, isShop } from './views/guides.js';
 import { helpView } from './views/help.js';
+import { weatherView } from './weather.js';
 
 const appEl = document.getElementById('app');
 
@@ -148,6 +149,7 @@ function render() {
       case 'shop': view = shopView(app); break;
       case 'guide': view = guideView(app, route[1]); active = isShop(app, route[1]) ? 'shop' : 'guides'; break;
       case 'help': view = helpView(app); break;
+      case 'weather': view = weatherView(app); active = 'today'; break;
       default: view = todayView(app); active = 'today';
     }
   } catch (e) {
