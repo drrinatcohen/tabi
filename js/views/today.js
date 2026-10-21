@@ -204,6 +204,7 @@ export function dayContent(app, day, { isToday = false } = {}) {
       h('div.card', h('ul', { style: 'margin:0;padding-inline-start:20px' }, day.ideas.map(t => R('li', t))))) : null,
     day.tips?.length ? h('div', h('h2.section', { html: icon('info') + 'שווה לדעת' }), day.tips.map(t => callout('gold', 'info', null, t))) : null,
     day.food?.length ? h('div', h('h2.section', { html: icon('food') + (day.foodTitle || 'אוכל') }), foodList(day.food)) : null,
+    day.more?.length ? h('div', h('h2.section', { html: icon('pin') + 'עוד באזור (לא מהספר של דור)' }), foodList(day.more)) : null,
     day.actions?.length ? h('div.btns', day.actions.map(a => actionBtn(app, a))) : null,
     day.book ? h('div', h('h2.section', { html: icon('book') + 'מהספר של דור' }),
       h('div.card.tint-ai', R('div', `כל ההסברים, ההמלצות והקישורים למפה מהספר שדור כתב לכם, בעמודים ${day.book[0]}-${day.book[1]}.`),

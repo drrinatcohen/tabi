@@ -207,7 +207,7 @@ export function timeline(app, items) {
 // ---------- food: one place per row (name opens Dor's map pin, then what it is, hours, price, booking) ----------
 export function foodList(items) {
   const row = p => h('div.place',
-    h('a.pn', { href: 'https://maps.app.goo.gl/' + p.c, target: '_blank', rel: 'noopener', html: icon('pin') }, h('span', p.n)),
+    h('a.pn', { href: p.u || 'https://maps.app.goo.gl/' + p.c, target: '_blank', rel: 'noopener', html: icon('pin') }, h('span', p.n)),
     p.d ? h('div.pd', p.d) : null,
     h('div.pc',
       p.h ? chip(p.h, '', 'clock') : null,

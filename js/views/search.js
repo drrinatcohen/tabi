@@ -56,7 +56,7 @@ function buildIndex(app) {
     }
     for (const s of day.ideas || []) { const [t, b] = split(s); add({ g: 'days', ic: 'star', tone: 'gold', label: where, title: t, body: b, route, key: t }); }
     for (const s of day.tips || []) { const [t, b] = split(s); add({ g: 'days', ic: 'info', tone: 'gold', label: where + ' · שווה לדעת', title: t, body: b, route, key: t }); }
-    for (const f of day.food || []) {
+    for (const f of [...(day.food || []), ...(day.more || [])]) {
       if (typeof f === 'string') { add({ g: 'days', ic: 'food', label: where + ' · אוכל', title: plain(f), body: '', route, key: plain(f) }); continue; }
       for (const p of f.places || []) add({ g: 'days', ic: 'food', label: where + (f.group ? ' · ' + f.group : ''), title: p.n, body: [p.d, p.h, p.p, p.b].filter(Boolean).join(' · '), route, key: p.n });
     }
