@@ -1,5 +1,5 @@
 // Service worker: app shell cached per build; encrypted data files are cached by the page (tabi-data).
-const VERSION = "64eb808e108b56e9";
+const VERSION = "7dff0de61fc97c00";
 const SHELL = ["./", "fonts/fonts.css", "fonts/noto-sans-hebrew-hebrew.woff2", "fonts/noto-sans-hebrew-latin-ext.woff2", "fonts/noto-sans-hebrew-latin.woff2", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "index.html", "js/components.js", "js/crypto.js", "js/icons.js", "js/main.js", "js/offline.js", "js/store.js", "js/ui.js", "js/views/guides.js", "js/views/help.js", "js/views/search.js", "js/views/today.js", "js/views/trip.js", "js/views/wallet.js", "js/weather.js", "manifest.webmanifest", "robots.txt", "styles.css"];
 const SHELL_CACHE = 'tabi-shell-' + VERSION;
 
