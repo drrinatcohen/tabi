@@ -9,6 +9,7 @@ import { walletView } from './views/wallet.js';
 import { guidesView, guideView, shopView, isShop } from './views/guides.js';
 import { helpView } from './views/help.js';
 import { weatherView } from './weather.js';
+import { yenView } from './yen.js';
 import { searchView, searchBar, showHit } from './views/search.js';
 
 const appEl = document.getElementById('app');
@@ -158,6 +159,7 @@ function render() {
       case 'guide': view = guideView(app, route[1]); active = isShop(app, route[1]) ? 'shop' : 'guides'; break;
       case 'help': view = helpView(app); break;
       case 'weather': view = weatherView(app); active = 'today'; break;
+      case 'yen': view = yenView(); active = 'today'; break;
       case 'search': view = searchView(app, decodeURIComponent(route[1] || '')); active = ''; break;
       default: view = todayView(app); active = 'today';
     }

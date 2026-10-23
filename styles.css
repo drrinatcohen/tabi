@@ -411,3 +411,19 @@ button.more[aria-expanded="true"]::after { content: " ▴"; }
 mark.hl { background: var(--gold-soft); color: inherit; border-radius: 4px; padding: 0 1px; box-shadow: inset 0 -2px 0 var(--gold); }
 .hit { animation: hitflash 2.6s ease-out; }
 @keyframes hitflash { 0%, 45% { box-shadow: 0 0 0 3px var(--gold); } 100% { box-shadow: 0 0 0 0 transparent; } }
+
+/* yen → shekel converter (Rinat 23.10) */
+.fx { padding: 16px; }
+.fx-label { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; margin-bottom: 8px; }
+.fx-label svg { width: 20px; height: 20px; color: var(--shu); }
+.fx-field { display: flex; align-items: center; gap: 10px; direction: ltr; border: 1.5px solid var(--line); border-radius: 14px; background: var(--card-2); padding: 0 14px; }
+.fx-field:focus-within { border-color: var(--shu); }
+.fx-cur { font-size: 26px; font-weight: 800; color: var(--ink-3); }
+.fx-input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit; font-size: 32px; font-weight: 800; color: var(--ink); padding: 10px 0; text-align: left; font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none; }
+.fx-input::placeholder { color: var(--ink-3); }
+.fx-eq { margin-top: 14px; color: var(--ink-2); font-weight: 700; font-size: 15px; }
+.fx-out { font-size: 40px; font-weight: 800; color: var(--shu-ink); line-height: 1.15; margin: 2px 0 8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.fx-table { display: grid; gap: 6px; }
+.fx-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); font: inherit; font-size: 17px; color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+.fx-row bdi:last-child { font-weight: 800; }
+.fx-row[aria-pressed="true"] { border-color: var(--shu); background: var(--shu-soft); }

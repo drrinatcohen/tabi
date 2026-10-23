@@ -3,6 +3,7 @@ import { h, R, btn, linkBtn, chip, callout, heDate, shortDate, nowIn, listItem }
 import { store } from '../store.js';
 import { timeline, hotelCard, journal, openBook, actionBtn, itemMinutes, trainQrBtn, openTaxi, foodList } from '../components.js';
 import { weatherChips } from '../weather.js';
+import { yenChip } from '../yen.js';
 
 const START = '2026-10-24';
 const LAND = '2026-10-26';
@@ -156,7 +157,7 @@ function preTrip(app) {
         h('div.countdown', String(days)),
         h('div', h('div.big', days === 1 ? 'יום לטיסה' : 'ימים לטיסה'), h('div.muted', 'מוצאי שבת 24.10 · 23:30 · נתב"ג טרמינל 3'))),
       // Rinat 20.10: the weather on the home screen, at the top where she looks (it opens the screen with every day and city)
-      clocks(null, h('a.clock.wxc', { href: '#/weather' }, h('span.wi', { html: icon('sun') }), h('span.wt', h('b', 'מזג האוויר בטיול'))))),
+      clocks(null, [h('a.clock.wxc', { href: '#/weather' }, h('span.wi', { html: icon('sun') }), h('span.wt', h('b', 'מזג האוויר בטיול'))), yenChip()])),
     installCard(app),
     h('div.card.flat', { 'data-offline': '' }),
     checklistCard(app),
@@ -193,7 +194,7 @@ export function dayContent(app, day, { isToday = false } = {}) {
       h('div.date', heDate(day.date) + (day.n > 0 ? ` · יום ${day.n} מתוך 17` : '')),
       h('div.city', day.city, day.cityJp ? h('span.jp', { lang: 'ja' }, day.cityJp) : null),
       R('div.title', day.title),
-      clocks(day, weatherChips(app, day))),
+      clocks(day, [weatherChips(app, day), yenChip()])),
     isToday ? nowCard(app, day) : null,
     isToday ? h('div.card.flat', { 'data-offline': 'today' }) : null,
     (day.warn || []).map(w => callout('shu', 'alert', null, w)),

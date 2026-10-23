@@ -22,6 +22,7 @@ export function guidesView(app) {
 export function shopView(app) {
   return h('div',
     h('div.screen-head', h('h1', 'קניות ואוכל'), h('div.sub', 'קודם ההמלצות של דור, ואחר כך הרשימה מהאקסל של החברה, עם הסבר לכל פריט')),
+    listItem({ ic: 'yen', tone: 'shu', t: 'המרת ין לשקל', d: 'מקלידים כמה ין, ורואים כמה זה בשקלים', onclick: () => app.go('yen') }),
     app.data.guides.filter(g => g.group === SHOP).map(g =>
       listItem({ ic: g.ic, tone: g.tone, t: g.title, d: g.sub, onclick: () => app.go('guide/' + g.id) })));
 }
