@@ -1,7 +1,8 @@
 // Weather forecast for each day's places (Open-Meteo: free, no key, up to 16 days ahead).
 // Needs internet; every forecast that arrives is kept on the phone, so the last one still shows offline.
 import { icon } from './icons.js';
-import { h, btn, linkBtn, shortDate, heDate, nowIn } from './ui.js';
+import { h, btn, linkBtn, shortDate, heDate, chip } from './ui.js';
+import { currentDate } from './views/today.js';
 import { store } from './store.js';
 
 const KEY = 'wx';
@@ -95,17 +96,18 @@ export function weatherCard(app, day) {
 }
 
 // Rinat 20.10: "כפתור בית למזג אוויר - אשמח רק שנבין על איזה עיר מדובר".
-// One screen (home button "מזג האוויר בטיול"): every day from today on, with its date and city, then the forecast for each place.
+// One screen (home button "מזג האוויר בטיול"): every day of the trip, with its date and city, then the forecast for each place.
 export function weatherView(app) {
   const all = app.data.days.filter(d => d.wx?.length);
-  const today = nowIn('Asia/Tokyo').date;
-  const days = all.some(d => d.date >= today) ? all.filter(d => d.date >= today) : all;
+  // Rinat 24.10: "שאראה מה היום הרלבנטי אבל כלום לא ייעלם": every day stays, today is marked and the screen opens on it
+  const days = all;
+  const today = currentDate(app);
   const list = h('div');
   const foot = h('div.faint.wx-foot', { style: 'margin:0 2px 10px' });
   const draw = data => {
-    list.replaceChildren(...days.map(day => h('div.card.wx',
+    list.replaceChildren(...days.map(day => h('div.card.wx' + (day.date === today ? '.wx-today' : ''),
       h('a.wx-day', { href: '#/day/' + day.id },
-        h('span', heDate(day.date)), h('span.wx-city', day.city)),
+        h('span', heDate(day.date), day.date === today ? [' ', chip('היום', 'shu', 'sun')] : null), h('span.wx-city', day.city)),
       ...rows(app, day, data))));
     foot.textContent = data.at
       ? `עודכן ${new Date(data.at).toLocaleString('he-IL', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })}. מתעדכן לבד כשיש אינטרנט.`
@@ -114,6 +116,7 @@ export function weatherView(app) {
   draw(store.get(KEY, { at: 0, p: {} }));
   pending = pending || refresh(app, false).finally(() => { pending = null; });
   pending.then(draw);
+  setTimeout(() => list.querySelector('.wx-today')?.scrollIntoView({ block: 'start' }), 60);
   return h('div',
     h('div.screen-head', h('h1', 'מזג האוויר בטיול'), h('div.sub', 'לכל יום: התאריך, העיר שבה נהיה, והתחזית לכל מקום באותו יום')),
     h('div.btns', { style: 'margin:0 0 8px' },

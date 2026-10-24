@@ -174,7 +174,7 @@ function render() {
   if (app.hit) {
     const hit = app.hit;
     app.hit = null;
-    // after the screen settles (the timeline folds past items in the next frame)
+    // after the screen settles (the timeline marks past items in the next frame)
     setTimeout(() => showHit(appEl, hit), 80);
   }
 }

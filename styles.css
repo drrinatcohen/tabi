@@ -359,11 +359,9 @@ span.jp { direction: ltr; unicode-bidi: isolate; }
 .tl-item.cur .tl-body { border: 2px solid var(--shu); }
 .tl-item.cur .tl-time .dot { background: var(--shu); border-color: var(--shu); }
 .tl-item.cur .tl-time .dot svg { color: #fff; }
-.tl-item.past:not(.open) .tl-body { opacity: .6; cursor: pointer; }
-.timeline .tl-item.past:not(.open) .tl-tag, .timeline .tl-item.past:not(.open) .d, .timeline .tl-item.past:not(.open) .more, .timeline .tl-item.past:not(.open) .btns { display: none; }
-.tl-item.past:not(.open) .tl-body .t::after { content: " · עבר"; font-weight: 600; color: var(--moss); font-size: 14px; }
+.tl-item.past .tl-body .t::after { content: " · עבר"; font-weight: 600; color: var(--moss); font-size: 14px; }
 .tl-item.past .tl-time { opacity: .55; }
-li.tl-train.past { opacity: .6; }
+
 .tl-body .d.clamp:not(.open) { display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 button.more { border: 0; background: none; padding: 4px 0; font: inherit; font-size: 15px; font-weight: 800; color: var(--ai); cursor: pointer; }
 button.more::after { content: " ▾"; }
@@ -430,3 +428,4 @@ mark.hl { background: var(--gold-soft); color: inherit; border-radius: 4px; padd
 /* very narrow phones (320px): the six nav labels fit */
 @media (max-width: 340px) { .nav button span { font-size: 11px; } }
 @media (max-width: 340px) { .prose table { font-size: 13px; } .prose th, .prose td { padding-inline: 4px; word-break: break-word; } }
+.card.wx.wx-today { outline: 2px solid var(--shu); scroll-margin-top: 80px; }

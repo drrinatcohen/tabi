@@ -93,7 +93,7 @@ function nowCard(app, day) {
   return box;
 }
 
-// past items fold to their title (a tap opens them), the current one is outlined
+// past items stay open in full, marked "עבר" (Rinat 24.10: nothing disappears); the current one is outlined
 function markTimeline(nm) {
   const lis = [...document.querySelectorAll('ol.timeline > li')];
   let cur = -1;
@@ -168,6 +168,11 @@ function preTrip(app) {
     installCard(app),
     h('div.card.flat', { 'data-offline': '' }),
     checklistCard(app),
+    tripGlance(app));
+}
+
+function tripGlance(app) {
+  return h('div',
     h('h2.section', 'הטיול במבט אחד'),
     h('div', app.data.days.filter(d => d.n > 0).reduce((acc, d) => {
       const last = acc[acc.length - 1];
@@ -179,12 +184,19 @@ function preTrip(app) {
       btn('הטיפים של דור לפני הטיול', 'book', () => app.go('guide/dorintro'), 'block ghost')));
 }
 
+// Rinat 24.10: "אני לא רוצה ששום דבר ייעלם כשעבר התאריך - שהכל יישאר!"
+// What was on the home screen before the trip stays, under the day (and after the trip).
+function beforeTripBlock(app, withChecklist = true) {
+  return h('div', withChecklist ? [h('h2.section', 'מהמסך של לפני הטיול'), checklistCard(app)] : null, tripGlance(app));
+}
+
 function afterTrip(app) {
   const lines = app.data.days.map(d => ({ d, t: store.get('journal:' + d.date, '') })).filter(x => x.t);
   return h('div',
     h('div.hero', h('div.eyebrow', 'ברוכים השבים'), h('div.city', 'בבית'), h('div.title', '25 שנה, 17 ימים, חלום אחד שהתגשם.')),
     h('h2.section', 'היומן שלך', h('span.count', `${lines.length} שורות`)),
-    lines.length ? lines.map(x => h('div.card', h('div.faint', heDate(x.d.date) + ' · ' + x.d.city), R('div', x.t))) : h('div.card.muted', 'לא נכתבו שורות ביומן בטלפון הזה.'));
+    lines.length ? lines.map(x => h('div.card', h('div.faint', heDate(x.d.date) + ' · ' + x.d.city), R('div', x.t))) : h('div.card.muted', 'לא נכתבו שורות ביומן בטלפון הזה.'),
+    beforeTripBlock(app));
 }
 
 export function dayContent(app, day, { isToday = false } = {}) {
@@ -227,7 +239,8 @@ export function todayView(app) {
   if (date < START) return preTrip(app);
   if (date > days[days.length - 1].date) return afterTrip(app);
   const day = days.find(d => d.date === date) || days[0];
-  return h('div', date === START ? [installCard(app), checklistCard(app)] : null, dayContent(app, day, { isToday: true }));
+  return h('div', date === START ? [installCard(app), checklistCard(app)] : null, dayContent(app, day, { isToday: true }),
+    beforeTripBlock(app, date !== START));
 }
 
 export function dayView(app, id) {

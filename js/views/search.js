@@ -1,5 +1,5 @@
 import { icon } from '../icons.js';
-import { h, shortDate, nowIn } from '../ui.js';
+import { h, shortDate } from '../ui.js';
 import { openBook } from '../components.js';
 import { openEntry } from './wallet.js';
 import { getFile } from '../offline.js';
@@ -99,10 +99,7 @@ function buildIndex(app) {
   for (const c of [...(hp.cancel || []), ...(hp.charges || [])]) add({ g: 'help', ic: 'cal', label: 'עזרה · ' + (c.until ? 'ביטול בחינם עד' : 'חיובים שעוד יורדים'), title: plain(c.hotel), body: plain(c.until || c.when), route: 'help', key: plain(c.hotel) });
   for (const s of [hp.cancelNote, hp.chargesNote].filter(Boolean)) add({ g: 'help', ic: 'info', label: 'עזרה', title: split(s)[0], body: plain(s), route: 'help', key: plain(s).slice(0, 30), noTitle: true });
 
-  // the checklist is on the home screen only until the day of the flight
-  if (nowIn('Asia/Jerusalem').date <= '2026-10-24') {
-    for (const c of d.checklist || []) add({ g: 'check', ic: 'check', tone: 'moss', label: 'רשימת ההכנה במסך הבית', title: plain(c.text), body: plain(c.when), route: 'today', key: plain(c.text).slice(0, 30) });
-  }
+  for (const c of d.checklist || []) add({ g: 'check', ic: 'check', tone: 'moss', label: 'רשימת ההכנה במסך הבית', title: plain(c.text), body: plain(c.when), route: 'today', key: plain(c.text).slice(0, 30) });
   return out;
 }
 

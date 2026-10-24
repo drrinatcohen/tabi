@@ -196,10 +196,6 @@ export function timeline(app, items) {
         d,
         long ? moreToggle(d) : null,
         it.actions?.length ? h('div.btns', it.actions.map(a => actionBtn(app, a))) : null));
-    // a past item is folded to its title; a tap opens it again
-    li.querySelector('.tl-body').addEventListener('click', e => {
-      if (li.classList.contains('past') && !e.target.closest('a,button')) li.classList.toggle('open');
-    });
     return li;
   }));
 }
