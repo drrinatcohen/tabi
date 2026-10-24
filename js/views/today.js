@@ -8,9 +8,14 @@ import { yenChip } from '../yen.js';
 const START = '2026-10-24';
 const LAND = '2026-10-26';
 
-function currentDate() {
-  const jp = nowIn('Asia/Tokyo').date;
-  return jp >= LAND ? jp : nowIn('Asia/Jerusalem').date;
+// Japan's date only from the takeoff in Bangkok (25.10 23:59 there = 26.10 01:59 in Japan): until then 25.10 stays on the screen at the gate.
+// After 11.11 the Israel date: the last day stays until midnight in Israel (they are still flying home).
+const TAKEOFF = LAND + 'T02:00';
+export function currentDate(app) {
+  const jp = nowIn('Asia/Tokyo'), il = nowIn('Asia/Jerusalem').date;
+  if (`${jp.date}T${jp.time}` < TAKEOFF) return il;
+  const end = app?.data.days[app.data.days.length - 1].date;
+  return end && jp.date > end ? (il > end ? il : end) : jp.date;
 }
 
 function zonesOf(day) {
@@ -217,7 +222,7 @@ export function dayContent(app, day, { isToday = false } = {}) {
 }
 
 export function todayView(app) {
-  const date = currentDate();
+  const date = currentDate(app);
   const days = app.data.days;
   if (date < START) return preTrip(app);
   if (date > days[days.length - 1].date) return afterTrip(app);
@@ -228,5 +233,5 @@ export function todayView(app) {
 export function dayView(app, id) {
   const day = app.data.days.find(d => d.id === id);
   if (!day) return todayView(app);
-  return dayContent(app, day, { isToday: day.date === currentDate() });
+  return dayContent(app, day, { isToday: day.date === currentDate(app) });
 }

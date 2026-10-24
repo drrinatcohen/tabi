@@ -248,7 +248,7 @@ textarea.journal { width: 100%; min-height: 96px; border-radius: 14px; border: 1
 .nav { position: fixed; inset-inline: 0; bottom: 0; z-index: 20; background: color-mix(in srgb, var(--card) 92%, transparent);
   backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px);
   border-top: 1px solid var(--line); padding-bottom: var(--safe-b); }
-.nav .inner { max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, 1fr); height: var(--nav-h); }
+.nav .inner { max-width: 600px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); height: var(--nav-h); }
 .nav button { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 13px; font-weight: 700; color: var(--ink-3); cursor: pointer; }
 .nav button svg { width: 25px; height: 25px; }
 .nav button[aria-current="page"] { color: var(--shu); }
@@ -427,3 +427,6 @@ mark.hl { background: var(--gold-soft); color: inherit; border-radius: 4px; padd
 .fx-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 8px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--card); font: inherit; font-size: 17px; color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
 .fx-row bdi:last-child { font-weight: 800; }
 .fx-row[aria-pressed="true"] { border-color: var(--shu); background: var(--shu-soft); }
+/* very narrow phones (320px): the six nav labels fit */
+@media (max-width: 340px) { .nav button span { font-size: 11px; } }
+@media (max-width: 340px) { .prose table { font-size: 13px; } .prose th, .prose td { padding-inline: 4px; word-break: break-word; } }

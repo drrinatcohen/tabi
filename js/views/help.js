@@ -14,9 +14,9 @@ export function helpView(app) {
 
     h('h2.section', { html: icon('phone') + 'מספרים חשובים' }),
     d.numbers.map(n => h('div.card', { style: 'padding:12px 14px' },
-      h('div.row.between',
+      h('div.row.between', { style: 'flex-wrap:wrap;gap:8px' },
         h('div', h('div', { style: 'font-weight:800' }, n.label), n.note ? R('div.faint', n.note) : null),
-        h('div.row', { style: 'gap:6px;flex:none' },
+        h('div.row', { style: 'gap:6px;flex-wrap:wrap' },
           n.wa ? linkBtn('וואטסאפ', 'share', 'https://wa.me/' + n.wa.replace(/\D/g, ''), 'sm') : null,
           n.tel ? linkBtn(n.tel, 'phone', 'tel:' + n.tel.replace(/[^\d+]/g, ''), 'sm primary num') : null)))),
 

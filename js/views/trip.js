@@ -1,10 +1,11 @@
 import { icon } from '../icons.js';
-import { h, R, shortDate, weekday, nowIn } from '../ui.js';
+import { h, R, shortDate, weekday } from '../ui.js';
 import { hotelCard } from '../components.js';
+import { currentDate } from './today.js';
 
 export function tripView(app, tab = 'days') {
   const d = app.data;
-  const today = nowIn('Asia/Tokyo').date;
+  const today = currentDate(app);
   const seg = h('div.seg', { role: 'group' },
     h('button', { type: 'button', 'aria-pressed': String(tab !== 'hotels'), onclick: () => app.go('trip/days') }, 'ימים'),
     h('button', { type: 'button', 'aria-pressed': String(tab === 'hotels'), onclick: () => app.go('trip/hotels') }, 'מלונות'));
