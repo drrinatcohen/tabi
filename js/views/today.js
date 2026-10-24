@@ -19,6 +19,8 @@ function zonesOf(day) {
       : [['ביפן', 'Asia/Tokyo'], ['בישראל', 'Asia/Jerusalem']];
 }
 
+const tripWeatherChip = () => h('a.clock.wxc', { href: '#/weather' }, h('span.wi', { html: icon('sun') }), h('span.wt', h('b', 'מזג האוויר בטיול')));
+
 function clocks(day, extra = null) {
   const fmt = tz => new Intl.DateTimeFormat('he-IL', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
   return h('div.clocks', zonesOf(day).map(([l, tz]) => h('span.clock', l, h('b', fmt(tz)))), extra);
@@ -157,7 +159,7 @@ function preTrip(app) {
         h('div.countdown', String(days)),
         h('div', h('div.big', days === 1 ? 'יום לטיסה' : 'ימים לטיסה'), h('div.muted', 'מוצאי שבת 24.10 · 23:30 · נתב"ג טרמינל 3'))),
       // Rinat 20.10: the weather on the home screen, at the top where she looks (it opens the screen with every day and city)
-      clocks(null, [h('a.clock.wxc', { href: '#/weather' }, h('span.wi', { html: icon('sun') }), h('span.wt', h('b', 'מזג האוויר בטיול'))), yenChip()])),
+      clocks(null, [tripWeatherChip(), yenChip()])),
     installCard(app),
     h('div.card.flat', { 'data-offline': '' }),
     checklistCard(app),
@@ -194,7 +196,8 @@ export function dayContent(app, day, { isToday = false } = {}) {
       h('div.date', heDate(day.date) + (day.n > 0 ? ` · יום ${day.n} מתוך 17` : '')),
       h('div.city', day.city, day.cityJp ? h('span.jp', { lang: 'ja' }, day.cityJp) : null),
       R('div.title', day.title),
-      clocks(day, [weatherChips(app, day), yenChip()])),
+      // Rinat 24.10 ("נעלם המזג אוויר"): 24.10 and 25.10 have no Japan forecast, so they get the button to the whole-trip screen
+      clocks(day, [weatherChips(app, day) || tripWeatherChip(), yenChip()])),
     isToday ? nowCard(app, day) : null,
     isToday ? h('div.card.flat', { 'data-offline': 'today' }) : null,
     (day.warn || []).map(w => callout('shu', 'alert', null, w)),
