@@ -36,5 +36,5 @@ export function guideView(app, id) {
     h('div.screen-head', h('h1', g.title), g.sub ? h('div.sub', g.sub) : null),
     h('div.prose', { html: g.html }),
     g.book ? h('div.btns', { style: 'margin-top:14px' },
-      btn(`לפתוח את העמודים בספר של דור (${g.book[0]}-${g.book[1]})`, 'book', () => openBook(app, g.book[0], g.book[1], g.title), 'ai block')) : null);
+      btn(g.book[0] === g.book[1] ? `לפתוח את העמוד בספר של דור (עמ' ${g.book[0]})` : `לפתוח את העמודים בספר של דור (${g.book[0]}-${g.book[1]})`, 'book', () => openBook(app, g.book[0], g.book[1], g.title), 'ai block')) : null);
 }

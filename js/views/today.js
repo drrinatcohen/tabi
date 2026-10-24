@@ -181,7 +181,8 @@ function tripGlance(app) {
     }, []).map(s => listItem({ ic: 'pin', tone: 'shu', t: `${s.city} {jp:${s.cityJp || ''}}`, d: s.from === s.to ? shortDate(s.from) : `${shortDate(s.from)} עד ${shortDate(s.to)}`, onclick: () => app.go('day/' + s.id) }))),
     h('div.btns', btn('יום היציאה: מה עושים ב-24.10', 'plane', () => app.go('day/d00'), 'block'),
       btn('אודות יפן (מהספר של דור)', 'torii', () => app.go('guide/japan'), 'block ghost'),
-      btn('הטיפים של דור לפני הטיול', 'book', () => app.go('guide/dorintro'), 'block ghost')));
+      btn('הטיפים של דור לפני הטיול', 'book', () => app.go('guide/dorintro'), 'block ghost'),
+      btn('השירותים ביפן: מה כל כפתור עושה', 'toilet', () => app.go('guide/toilet'), 'block ghost')));
 }
 
 // Rinat 24.10: "אני לא רוצה ששום דבר ייעלם כשעבר התאריך - שהכל יישאר!"
