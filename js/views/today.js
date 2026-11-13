@@ -1,5 +1,5 @@
 import { icon } from '../icons.js';
-import { h, R, btn, linkBtn, chip, callout, heDate, shortDate, nowIn, listItem } from '../ui.js';
+import { h, R, btn, linkBtn, chip, callout, heDate, shortDate, nowIn, listItem, copyText } from '../ui.js';
 import { store } from '../store.js';
 import { timeline, hotelCard, journal, openBook, actionBtn, itemMinutes, trainQrBtn, openTaxi, foodList } from '../components.js';
 import { weatherChips } from '../weather.js';
@@ -197,7 +197,15 @@ function afterTrip(app) {
     h('div.hero', h('div.eyebrow', 'ברוכים השבים'), h('div.city', 'בבית'), h('div.title', '25 שנה, 17 ימים, חלום אחד שהתגשם.')),
     h('h2.section', 'היומן שלך', h('span.count', `${lines.length} שורות`)),
     lines.length ? lines.map(x => h('div.card', h('div.faint', heDate(x.d.date) + ' · ' + x.d.city), R('div', x.t))) : h('div.card.muted', 'לא נכתבו שורות ביומן בטלפון הזה.'),
+    lines.length ? h('div.btns', btn('לשלוח ל' + app.name(app.partner()) + ' את כל היומן', 'share', () => shareJournal(app, lines), 'block')) : null,
     beforeTripBlock(app));
+}
+
+// Rinat 13.11: "איך מעבירה גם לנסי את כל הסיכומים היומיים" = all lines in one message, in order.
+async function shareJournal(app, lines) {
+  const text = 'היומן שלי מיפן\n\n' + lines.map(x => `${heDate(x.d.date)} · ${x.d.city}\n${x.t}`).join('\n\n');
+  if (navigator.share) { try { await navigator.share({ text }); } catch { /* cancelled */ } }
+  else copyText(text, 'הועתק. אפשר להדביק בוואטסאפ');
 }
 
 export function dayContent(app, day, { isToday = false } = {}) {
