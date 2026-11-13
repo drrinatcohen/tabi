@@ -1,5 +1,6 @@
 import { icon } from '../icons.js';
-import { h, R, btn, linkBtn, chip, callout, heDate, shortDate, nowIn, listItem, copyText } from '../ui.js';
+import { h, R, btn, linkBtn, chip, callout, heDate, shortDate, nowIn, listItem, copyText, toast } from '../ui.js';
+import { ownJournal, partnerJournal, journalLink, importJournal } from '../journal_share.js';
 import { store } from '../store.js';
 import { timeline, hotelCard, journal, openBook, actionBtn, itemMinutes, trainQrBtn, openTaxi, foodList } from '../components.js';
 import { weatherChips } from '../weather.js';
@@ -191,21 +192,50 @@ function beforeTripBlock(app, withChecklist = true) {
   return h('div', withChecklist ? [h('h2.section', 'מהמסך של לפני הטיול'), checklistCard(app)] : null, tripGlance(app));
 }
 
+function journalCards(app, j) {
+  return app.data.days.filter(d => j[d.date]).map(d => h('div.card', h('div.faint', heDate(d.date) + ' · ' + d.city), R('div', j[d.date])));
+}
+
 function afterTrip(app) {
-  const lines = app.data.days.map(d => ({ d, t: store.get('journal:' + d.date, '') })).filter(x => x.t);
+  const mine = ownJournal(app), n = Object.keys(mine).length;
+  const other = partnerJournal(app), otherName = app.name(app.partner());
+  const m = other ? Object.keys(other.j).length : 0;
+  // made ahead, so the share sheet opens inside the tap (the iPhone allows it only there)
+  let link = null;
+  if (n) journalLink(app).then(l => { link = l; }).catch(() => {});
   return h('div',
     h('div.hero', h('div.eyebrow', 'ברוכים השבים'), h('div.city', 'בבית'), h('div.title', '25 שנה, 17 ימים, חלום אחד שהתגשם.')),
-    h('h2.section', 'היומן שלך', h('span.count', `${lines.length} שורות`)),
-    lines.length ? lines.map(x => h('div.card', h('div.faint', heDate(x.d.date) + ' · ' + x.d.city), R('div', x.t))) : h('div.card.muted', 'לא נכתבו שורות ביומן בטלפון הזה.'),
-    lines.length ? h('div.btns', btn('לשלוח ל' + app.name(app.partner()) + ' את כל היומן', 'share', () => shareJournal(app, lines), 'block')) : null,
+    n || !other ? [
+      h('h2.section', 'היומן שלך', h('span.count', `${n} שורות`)),
+      n ? journalCards(app, mine) : h('div.card.muted', 'לא נכתבו שורות ביומן בטלפון הזה.'),
+      n ? h('div.btns', btn('לשלוח ל' + otherName + ' את כל היומן', 'share', () => shareJournal(app, mine, link), 'block')) : null,
+    ] : null,
+    other ? [h('h2.section', 'היומן של ' + otherName, h('span.count', `${m} שורות`)), journalCards(app, other.j)] : receiveBox(app, otherName),
     beforeTripBlock(app));
 }
 
-// Rinat 13.11: "איך מעבירה גם לנסי את כל הסיכומים היומיים" = all lines in one message, in order.
-async function shareJournal(app, lines) {
-  const text = 'היומן שלי מיפן\n\n' + lines.map(x => `${heDate(x.d.date)} · ${x.d.city}\n${x.t}`).join('\n\n');
+// Rinat 13.11: "איך מעבירה גם לנסי את כל הסיכומים היומיים" + "שיופיע לו באפליקציה כמו אצלי":
+// one message with a link (opens the app and saves the journal there) and the lines themselves, in order.
+async function shareJournal(app, mine, link) {
+  link = link || await journalLink(app);
+  const lines = app.data.days.filter(d => mine[d.date]).map(d => `${heDate(d.date)} · ${d.city}\n${mine[d.date]}`);
+  const text = 'היומן שלי מיפן\n' + app.name(app.partner()) + ', לחיצה על הקישור שומרת אותו אצלך באפליקציה:\n' + link + '\n\n' + lines.join('\n\n');
   if (navigator.share) { try { await navigator.share({ text }); } catch { /* cancelled */ } }
   else copyText(text, 'הועתק. אפשר להדביק בוואטסאפ');
+}
+
+// If the link opened in the browser and not in the app: paste the WhatsApp message here.
+function receiveBox(app, otherName) {
+  const ta = h('textarea.journal', { placeholder: 'להדביק כאן את ההודעה מוואטסאפ', 'aria-label': 'הודעת היומן' });
+  const take = async () => {
+    const from = await importJournal(app, ta.value);
+    if (from) { toast('היומן של ' + app.name(from) + ' נשמר באפליקציה'); app.rerender(); }
+    else toast('לא נמצא יומן בהודעה הזו');
+  };
+  return h('details.card', { style: 'margin-top:14px' },
+    h('summary', 'קיבלת את היומן של ' + otherName + ' בוואטסאפ והוא לא נכנס?'),
+    h('div.faint', { style: 'margin:8px 0' }, 'להעתיק את כל ההודעה בוואטסאפ, להדביק כאן וללחוץ "לשמור".'),
+    ta, h('div.btns', btn('לשמור', 'check', take, 'sm')));
 }
 
 export function dayContent(app, day, { isToday = false } = {}) {

@@ -11,6 +11,7 @@ import { helpView } from './views/help.js';
 import { weatherView } from './weather.js';
 import { yenView } from './yen.js';
 import { searchView, searchBar, showHit } from './views/search.js';
+import { importJournal } from './journal_share.js';
 
 const appEl = document.getElementById('app');
 
@@ -178,7 +179,19 @@ function render() {
     setTimeout(() => showHit(appEl, hit), 80);
   }
 }
-window.addEventListener('hashchange', () => { if (!/k=/.test(location.hash)) render(); });
+// A journal link from the partner (#j=...): save it and show it on the home screen
+async function takeJournal() {
+  if (!/#jz?=/.test(location.hash)) return false;
+  const from = await importJournal(app, location.hash);
+  history.replaceState(null, '', location.pathname + location.search + '#/today');
+  toast(from ? 'היומן של ' + app.name(from) + ' נשמר באפליקציה' : 'לא הצלחתי לפתוח את היומן מהקישור');
+  return true;
+}
+window.addEventListener('hashchange', async () => {
+  if (/k=/.test(location.hash)) return;
+  if (app.data) await takeJournal();
+  render();
+});
 
 // ---------- boot ----------
 function needNetwork() {
@@ -218,6 +231,7 @@ async function boot() {
 
   app.who = app.who || await recall('who');
   if (!app.who) await whoScreen();
+  await takeJournal();
   if (!location.hash || /k=/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search + '#/today');
   render();
   startSync();

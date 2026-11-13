@@ -18,7 +18,7 @@ export function bytesToB64u(bytes) {
 }
 
 export async function importKey(raw) {
-  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['decrypt']);
+  return crypto.subtle.importKey('raw', raw, { name: 'AES-GCM' }, false, ['decrypt', 'encrypt']);
 }
 
 export async function decryptBuf(key, buf) {
@@ -26,6 +26,14 @@ export async function decryptBuf(key, buf) {
   const iv = bytes.slice(0, 12);
   const data = bytes.slice(12);
   return crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, data);
+}
+
+export async function encryptBuf(key, bytes) {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, bytes));
+  const out = new Uint8Array(12 + ct.length);
+  out.set(iv); out.set(ct, 12);
+  return out;
 }
 
 export async function decryptJSON(key, buf) {
